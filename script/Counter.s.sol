@@ -3,22 +3,25 @@ pragma solidity 0.8.23;
 
 import {Script, console} from "forge-std/Script.sol";
 import {Counter} from "../src/Counter.sol";
+import {HelloWorld} from "../src/HelloWorld.sol";
 
 contract CounterScript is Script {
-
     Counter public counter;
 
     function setUp() public {}
 
     function run() public {
-       // vm.broadcast();
+        // vm.broadcast();
         uint privateKey = vm.envUint("PRIVATE_KEY");
 
         vm.createSelectFork(vm.rpcUrl("sepolia"));
         vm.startBroadcast(privateKey);
-        counter = new Counter();
-        counter.setNumber(123456);
-        counter.increment();
+        //counter = new Counter();
+        //counter.setNumber(123456);
+        //counter.increment();
+
+        new HelloWorld("Hello from foundry");
+
         vm.stopBroadcast();
     }
 }

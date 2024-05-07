@@ -1,0 +1,8 @@
+{
+    "extends": "solhint:recommended",
+    "rules": {
+      "indent": ["error", 4],  // Use 4 spaces for indentation
+      "max-line-length": ["warn", 120]  // Max line length of 120 characters
+    }
+  }
+  
