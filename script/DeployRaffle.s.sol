@@ -1,20 +1,60 @@
 //SPDX-Licesnse-Identifier: MIT
 pragma solidity ^0.8.18;
 
-import {Script} from "forge-std/Script.sol";
+import {Script, console} from "forge-std/Script.sol";
 import {Raffle} from "../src/Raffle.sol";
+import {HelperConfig} from "./HelperConfig.s.sol";
+import {CreateSubscription, FundSubscription, AddConsumer} from "./Interactions.s.sol";
 
 contract DeployRaffle is Script {
-    function run() external returns (Raffle) {
-        // Deploy the Raffle contract
+    function run() external returns (Raffle, HelperConfig) {
+        HelperConfig helperConfig = new HelperConfig(); // This comes with our mocks!
+        AddConsumer addConsumer = new AddConsumer();
+        (
+            uint64 subscriptionId,
+            bytes32 gasLane,
+            uint256 automationUpdateInterval,
+            uint256 raffleEntranceFee,
+            uint32 callbackGasLimit,
+            address vrfCoordinatorV2,
+            address link,
+            uint256 deployerKey
+        ) = helperConfig.activeNetworkConfig();
+
+        if (subscriptionId == 0) {
+            CreateSubscription createSubscription = new CreateSubscription();
+            (subscriptionId, vrfCoordinatorV2) = createSubscription.createSubscription(
+                vrfCoordinatorV2,
+                deployerKey
+            );
+
+            FundSubscription fundSubscription = new FundSubscription();
+            fundSubscription.fundSubscription(
+                vrfCoordinatorV2,
+                subscriptionId,
+                link,
+                deployerKey
+            );
+        }
+
+        vm.startBroadcast(deployerKey);
         Raffle raffle = new Raffle(
-            1000000000000000000, // 1 ETH
-            86400, // 1 day
-            0x8103B0A8A00be2DDC778e6e7eaa21791Cd364625, // VRF Coordinator
-            0x474e34a077df58807dbe9c96d3c009b23b3c6d0cce433e59bbf5b34f823bc56c, // Gas Lane
-            500000, // Callback Gas Limit
-            0 // Subscription ID
+            subscriptionId,
+            gasLane,
+            automationUpdateInterval,
+            raffleEntranceFee,
+            callbackGasLimit,
+            vrfCoordinatorV2
         );
-        return raffle;
+        vm.stopBroadcast();
+
+        // We already have a broadcast in here
+        addConsumer.addConsumer(
+            address(raffle),
+            vrfCoordinatorV2,
+            subscriptionId,
+            deployerKey
+        );
+        return (raffle, helperConfig);
     }
 }
