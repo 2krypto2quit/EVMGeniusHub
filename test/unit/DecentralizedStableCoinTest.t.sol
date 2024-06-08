@@ -7,7 +7,6 @@ import {Test, console} from "forge-std/Test.sol";
 import {StdCheats} from "forge-std/StdCheats.sol";
 
 contract DecentralizedStablecoinTest is StdCheats, Test {
-
     DecentralizedStableCoin dsc;
 
     function setUp() public {
@@ -30,11 +29,10 @@ contract DecentralizedStablecoinTest is StdCheats, Test {
 
     function testCantBurnMoreThanYouHave() public {
         vm.startPrank(dsc.owner());
-        dsc.mint(address(this),100);
+        dsc.mint(address(this), 100);
         vm.expectRevert();
         dsc.burn(101);
         vm.stopPrank();
-
     }
 
     function testCanMintZeroToAddress() public {
@@ -43,5 +41,4 @@ contract DecentralizedStablecoinTest is StdCheats, Test {
         dsc.mint(address(0), 100);
         vm.stopPrank();
     }
-
 }
