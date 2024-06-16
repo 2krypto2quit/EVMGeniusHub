@@ -9,10 +9,16 @@ contract ContractA is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
    uint256 public amount;
 
+   //disable any initialization during contract deployment.
    constructor() {
       _disableInitializers();
    }
-    
+
+   //Proxies don’t use constructors, so we use the initializer function to set the owner
+     function initialize() public initializer {
+        __Ownable_init(msg.sender); //sets owner to msg.sender
+        __UUPSUpgradeable_init();
+    }
     function initialAmount(uint _amount) public returns(uint){
         amount = _amount;
         return amount;

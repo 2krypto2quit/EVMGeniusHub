@@ -64,3 +64,7 @@ $ forge --help
 $ anvil --help
 $ cast --help
 ```
+
+##How our proxy will work
+
+Anytime our proxy receives data for a function it doesn’t recognize, it sends it to our implementation contractA; where it will call the function through the delegate call to contractB. Moreover, when contractA executes a delegate call to contractB, B’s code is executed with A’s storage, msg.sender, and msg.value. This is basically the process of upgrading contractA to contractB.
